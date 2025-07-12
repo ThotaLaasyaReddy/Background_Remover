@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Background Remover</title>
+    <style>
+        body {
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            color: #fff;
+        }
+        .container {
+            background: #ffffffcc;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: #333;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        button {
+            background: #0072ff;
+            border: none;
+            padding: 10px 20px;
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0055cc;
+        }
+        img {
+            margin-top: 15px;
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #3333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Remove Background</h1>
+        <form id="uploadForm">
+            <input type="file" id="imageInput" name="image" accept="image/*" required><br>
+            <button type="submit">Upload & Remove Background</button>
+        </form>
+        <div id="result" style="display:none;">
+            <h2>Processed Image</h2>
+            <img id="outputImage" src="" alt="Output Image">
+            <br>
+            <a id="downloadLink" href="" download>
+                <button>Download</button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById("uploadForm");
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById("imageInput");
+            const formData = new FormData();
+            formData.append("image", fileInput.files[0]);
+
+            const response = await fetch("/process", {
+                method: "POST",
+                body: formData
+            });
+            const data = await response.json();
+
+            if (data.url) {
+                document.getElementById("outputImage").src = data.url;
+                document.getElementById("downloadLink").href = data.url;
+                document.getElementById("result").style.display = "block";
+            } else {
+                alert("Error processing image: " + (data.error || "Unknown error"));
+            }
+        });
+    </script>
+</body>
+</html>
